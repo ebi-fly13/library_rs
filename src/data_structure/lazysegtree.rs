@@ -6,6 +6,7 @@ where
 {
     n: usize,
     size: usize,
+    log: usize,
     data: Vec<<M::S as Monoid>::S>,
     lazy: Vec<M::F>,
 }
@@ -15,13 +16,15 @@ where
     M: MapMonoid,
 {
     pub fn new(n: usize) -> Self {
-        let mut size = 1;
-        while size < n {
-            size *= 2;
+        let mut log = 1;
+        while (1<<log) < n {
+            log += 1;
         }
+        let size = 1<<log;
         Self {
             n,
             size,
+            log,
             data: vec![M::e(); 2 * size],
             lazy: vec![M::id(); size],
         }
@@ -30,11 +33,11 @@ where
     pub fn set(&mut self, idx: usize, x: <M::S as Monoid>::S) {
         assert!(idx < self.n);
         let idx = idx + self.size;
-        for i in (1..self.size).rev() {
+        for i in (1..(self.log + 1)).rev() {
             self.push(idx >> i);
         }
         self.data[idx] = x;
-        for i in 1..self.size {
+        for i in 1..(self.log + 1) {
             self.update(idx >> i);
         }
     }
@@ -42,7 +45,7 @@ where
     pub fn get(&mut self, idx: usize) -> <M::S as Monoid>::S {
         assert!(idx < self.n);
         let idx = idx + self.size;
-        for i in (1..self.size).rev() {
+        for i in (1..(self.log + 1)).rev() {
             self.push(idx >> i);
         }
         self.data[idx].clone()
@@ -52,7 +55,7 @@ where
         assert!(l < self.n && r < self.n);
         let l = l + self.size;
         let r = r + self.size;
-        for i in (1..self.size).rev() {
+        for i in (1..(self.log + 1)).rev() {
             if (l >> i) << i != l {
                 self.push(l >> i);
             }
@@ -87,7 +90,7 @@ where
         assert!(l < self.n && r < self.n);
         let l = l + self.size;
         let r = r + self.size;
-        for i in (1..self.size).rev() {
+        for i in (1..(self.log + 1)).rev() {
             if (l >> i) << i != l {
                 self.push(l >> i);
             }
@@ -111,7 +114,7 @@ where
         }
         let l = l + self.size;
         let r = r + self.size;
-        for i in (1..self.size).rev() {
+        for i in (1..(self.log + 1)).rev() {
             if (l >> i) << i != l {
                 self.update(l >> i);
             }
