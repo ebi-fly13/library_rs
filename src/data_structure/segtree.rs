@@ -10,7 +10,8 @@ where
 }
 
 impl<M> SegTree<M>
-where M: Monoid
+where
+    M: Monoid,
 {
     pub fn new(n: usize) -> Self {
         let mut size = 1;
@@ -20,7 +21,7 @@ where M: Monoid
         Self {
             n,
             size,
-            data: vec![M::e(); 2*size],
+            data: vec![M::e(); 2 * size],
         }
     }
 
@@ -30,7 +31,7 @@ where M: Monoid
         self.data[idx] = x;
         while idx > 1 {
             idx >>= 1;
-            self.data[idx] = M::op(&self.data[idx<<1], &self.data[(idx<<1)|1]);
+            self.data[idx] = M::op(&self.data[idx << 1], &self.data[(idx << 1) | 1]);
         }
     }
 
