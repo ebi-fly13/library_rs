@@ -1,4 +1,4 @@
-use crate::utility::monoid::MapMonoid;
+use crate::utility::monoid::{MapMonoid, Monoid};
 
 pub struct LazySegTree<M>
 where
@@ -6,7 +6,7 @@ where
 {
     n: usize,
     size: usize,
-    data: Vec<M::S>,
+    data: Vec<<M::S as Monoid>::S>,
     lazy: Vec<M::F>,
 }
 
@@ -27,19 +27,30 @@ where
         }
     }
 
-    pub fn set(&mut self, idx: usize, x: M::S) {}
+    pub fn set(&mut self, idx: usize, x: <M::S as Monoid>::S) {}
 
-    pub fn get(&self, idx: usize) -> M::S {
+    pub fn get(&self, idx: usize) -> <M::S as Monoid>::S {
         M::e()
     }
 
-    pub fn prod(&self, l: usize, r: usize) -> M::S {
+    pub fn prod(&self, l: usize, r: usize) -> <M::S as Monoid>::S {
         M::e()
     }
 
-    pub fn all_prod(&self) -> M::S {
+    pub fn all_prod(&self) -> <M::S as Monoid>::S {
         M::e()
     }
 
     pub fn apply(&mut self, l: usize, r: usize, f: M::F) {}
+}
+
+impl<M> LazySegTree<M>
+where
+    M: MapMonoid,
+{
+    fn update(&mut self, idx: usize) {}
+
+    fn all_apply(&mut self, idx: usize) {}
+
+    fn push(&mut self, idx: usize) {}
 }
