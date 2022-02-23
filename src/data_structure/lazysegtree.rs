@@ -17,10 +17,10 @@ where
 {
     pub fn new(n: usize) -> Self {
         let mut log = 1;
-        while (1<<log) < n {
+        while (1 << log) < n {
             log += 1;
         }
-        let size = 1<<log;
+        let size = 1 << log;
         Self {
             n,
             size,
@@ -52,7 +52,10 @@ where
     }
 
     pub fn prod(&mut self, l: usize, r: usize) -> <M::S as Monoid>::S {
-        assert!(l < self.n && r < self.n);
+        assert!(l < self.n && r <= self.n);
+        if l == r {
+            return M::e();
+        }
         let l = l + self.size;
         let r = r + self.size;
         for i in (1..(self.log + 1)).rev() {
@@ -87,33 +90,37 @@ where
     }
 
     pub fn apply(&mut self, l: usize, r: usize, f: M::F) {
-        assert!(l < self.n && r < self.n);
-        let l = l + self.size;
-        let r = r + self.size;
+        assert!(l < self.n && r <= self.n);
+        if l == r {
+            return;
+        }
+        let mut l = l + self.size;
+        let mut r = r + self.size;
         for i in (1..(self.log + 1)).rev() {
-            if (l >> i) << i != l {
+            if ((l >> i) << i) != l {
                 self.push(l >> i);
             }
-            if (r >> i) << i != r {
+            if ((r >> i) << i) != r {
                 self.push((r - 1) >> i);
             }
         }
-        let mut l = l;
-        let mut r = r;
-        while l < r {
-            if l & 1 == 1 {
-                self.all_apply(l, f.clone());
-                l += 1;
+        {
+            let keep = (l, r);
+            while l < r {
+                if l & 1 == 1 {
+                    self.all_apply(l, f.clone());
+                    l += 1;
+                }
+                if r & 1 == 1 {
+                    r -= 1;
+                    self.all_apply(r, f.clone());
+                }
+                l >>= 1;
+                r >>= 1;
             }
-            if r & 1 == 1 {
-                r -= 1;
-                self.all_apply(r - 1, f.clone());
-            }
-            l >>= 1;
-            r >>= 1;
+            l = keep.0;
+            r = keep.1;
         }
-        let l = l + self.size;
-        let r = r + self.size;
         for i in (1..(self.log + 1)).rev() {
             if (l >> i) << i != l {
                 self.update(l >> i);
