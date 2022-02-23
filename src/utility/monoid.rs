@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 use std::ops::{Add, Mul};
+use crate::utility::internal_type_trait::Zero;
 
 pub trait Monoid {
     type S: Clone;
@@ -19,16 +20,6 @@ pub trait MapMonoid {
     fn id() -> Self::F;
     fn mapping(f: &Self::F, x: &<Self::S as Monoid>::S) -> <Self::S as Monoid>::S;
     fn composition(f: &Self::F, g: &Self::F) -> Self::F;
-}
-
-pub trait Zero {
-    fn zero() -> Self;
-}
-
-impl Zero for i64 {
-    fn zero() -> Self {
-        0
-    }
 }
 
 pub struct Sum<T>(PhantomData<fn() -> T>);

@@ -156,3 +156,27 @@ where
         self.lazy[idx] = M::id();
     }
 }
+
+impl<M: MapMonoid> From<Vec<<M::S as Monoid>::S>> for LazySegTree<M> {
+    fn from(vec: Vec<<M::S as Monoid>::S>) -> Self {
+        let n = vec.len();
+        let mut log = 1;
+        while (1<<log) < n {
+            log += 1;
+        }
+        let size = 1<<log;
+        let mut data = vec![M::e(); 2*size];
+        data[size..(size + n)].clone_from_slice(&vec);
+        let mut seg = Self { 
+            n, 
+            size, 
+            log, 
+            data,
+            lazy: vec![M::id(); size],
+        };
+        for i in (1..size).rev() {
+            seg.update(i);
+        }
+        seg
+    }
+}
