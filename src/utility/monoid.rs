@@ -1,6 +1,6 @@
+use crate::utility::internal_type_trait::Zero;
 use std::marker::PhantomData;
 use std::ops::{Add, Mul};
-use crate::utility::internal_type_trait::Zero;
 
 pub trait Monoid {
     type S: Clone;

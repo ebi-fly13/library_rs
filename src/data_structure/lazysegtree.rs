@@ -52,7 +52,7 @@ where
     }
 
     pub fn prod(&mut self, l: usize, r: usize) -> <M::S as Monoid>::S {
-        assert!(l < self.n && r <= self.n);
+        assert!(l <= self.n && r <= self.n);
         if l == r {
             return M::e();
         }
@@ -90,7 +90,7 @@ where
     }
 
     pub fn apply(&mut self, l: usize, r: usize, f: M::F) {
-        assert!(l < self.n && r <= self.n);
+        assert!(l < self.n && l <= r && r <= self.n);
         if l == r {
             return;
         }
@@ -121,11 +121,11 @@ where
             l = keep.0;
             r = keep.1;
         }
-        for i in (1..(self.log + 1)).rev() {
-            if (l >> i) << i != l {
+        for i in 1..(self.log + 1) {
+            if ((l >> i) << i) != l {
                 self.update(l >> i);
             }
-            if (r >> i) << i != r {
+            if ((r >> i) << i) != r {
                 self.update((r - 1) >> i);
             }
         }
@@ -161,16 +161,16 @@ impl<M: MapMonoid> From<Vec<<M::S as Monoid>::S>> for LazySegTree<M> {
     fn from(vec: Vec<<M::S as Monoid>::S>) -> Self {
         let n = vec.len();
         let mut log = 1;
-        while (1<<log) < n {
+        while (1 << log) < n {
             log += 1;
         }
-        let size = 1<<log;
-        let mut data = vec![M::e(); 2*size];
+        let size = 1 << log;
+        let mut data = vec![M::e(); 2 * size];
         data[size..(size + n)].clone_from_slice(&vec);
-        let mut seg = Self { 
-            n, 
-            size, 
-            log, 
+        let mut seg = Self {
+            n,
+            size,
+            log,
             data,
             lazy: vec![M::id(); size],
         };
