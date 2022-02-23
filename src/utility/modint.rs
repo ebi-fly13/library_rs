@@ -1,6 +1,7 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::marker::PhantomData;
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
+#[derive(Copy, Clone)]
 pub struct static_modint<M: Modulus> {
     val: u32,
     phantom: PhantomData<fn() -> M>,
@@ -8,7 +9,7 @@ pub struct static_modint<M: Modulus> {
 
 impl<M> static_modint<M>
 where
-M: Modulus
+    M: Modulus,
 {
     fn new() -> Self {
         Self {
@@ -28,7 +29,7 @@ M: Modulus
 
 impl<M> Add for static_modint<M>
 where
-    M:Modulus
+    M: Modulus,
 {
     type Output = Self;
     fn add(mut self, other: Self) -> Self {
@@ -37,9 +38,9 @@ where
     }
 }
 
-impl<M> AddAssign for static_modint<M> 
+impl<M> AddAssign for static_modint<M>
 where
-    M: Modulus
+    M: Modulus,
 {
     fn add_assign(&mut self, other: Self) {
         self.val += other.val;
@@ -49,9 +50,65 @@ where
     }
 }
 
+impl<M> Sub for static_modint<M>
+where
+    M: Modulus,
+{
+    type Output = Self;
+    fn sub(mut self, other: Self) -> Self {
+        self -= other;
+        self
+    }
+}
+
+impl<M> SubAssign for static_modint<M>
+where
+    M: Modulus,
+{
+    fn sub_assign(&mut self, rhs: Self) {
+        if self.val < rhs.val {
+            self.val += M::MOD;
+        }
+        self.val -= rhs.val;
+    }
+}
+
+impl<M> Mul for static_modint<M>
+where
+    M: Modulus,
+{
+    type Output = Self;
+    fn mul(mut self, rhs: Self) -> Self {
+        self *= rhs;
+        self
+    }
+}
+
+impl<M> MulAssign for static_modint<M>
+where
+    M: Modulus,
+{
+    fn mul_assign(&mut self, rhs: Self) {
+        self.val = ((self.val as u64 * rhs.val as u64) % M::MOD as u64) as u32;
+    }
+}
+
+impl<M> Neg for static_modint<M>
+where
+    M: Modulus,
+{
+    type Output = Self;
+    fn neg(self) -> Self {
+        Self {
+            val: M::MOD - self.val,
+            phantom: PhantomData,
+        }
+    }
+}
+
 pub trait Modulus {
     const MOD: u32;
-    const IS_PRIME : bool;
+    const IS_PRIME: bool;
 }
 
 pub struct Mod1000000007;
