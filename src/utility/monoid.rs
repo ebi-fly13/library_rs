@@ -88,13 +88,13 @@ impl<T> MapMonoid for MapAffineSumMonoid<T>
 where
     T: Zero + One + Add<Output = T> + Mul<Output = T> + Copy,
 {
-    type S = MapAddSumMonoid<T>;
+    type S = MapAffineSumMonoid<T>;
     type F = (T, T);
     fn id() -> Self::F {
         (T::one(), T::zero())
     }
     fn mapping(&f: &Self::F, &x: &<Self::S as Monoid>::S) -> <Self::S as Monoid>::S {
-        (x.0 * f.0 + f.1, x.1)
+        (x.0 * f.0 + x.1 * f.1, x.1)
     }
     fn composition(&f: &Self::F, &g: &Self::F) -> Self::F {
         (f.0 * g.0, f.0 * g.1 + f.1)
