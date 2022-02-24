@@ -7,3 +7,7 @@ impl Zero for i64 {
         0
     }
 }
+
+pub trait One {
+    fn one() -> Self;
+}
