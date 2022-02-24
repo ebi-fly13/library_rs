@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 use std::fmt;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Div, DivAssign, Neg, Sub, SubAssign};
-use crate::utility::internal_type_trait::Zero;
+use crate::utility::internal_type_trait::{Zero, One};
 
 pub type ModInt1000000007 = StaticModInt<Mod1000000007>;
 pub type ModInt998244353 = StaticModInt<Mod998244353>;
@@ -58,6 +58,18 @@ where
 {
     fn zero() -> Self {
         Default::default()
+    }
+}
+
+impl<M> One for StaticModInt<M>
+where
+    M: Modulus
+{
+    fn one() -> Self {
+        Self {
+            val: 1,
+            phantom: PhantomData,
+        }
     }
 }
 
